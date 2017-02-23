@@ -155,6 +155,7 @@ def do(l):
 	printr("caches", cv)
 	
 	dumb(v,e,r,c,x,sv,ev,rv,cv)
+	print(len(cv))
 	for cache_e in cv: print(str(cache_e))
 
 def main():
