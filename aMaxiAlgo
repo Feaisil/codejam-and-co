@@ -164,8 +164,9 @@ def dumb2(v,e,r,c,x,sv,ev,rv,cv):
 	rv = calculerGains(v,e,r,c,x,sv,ev,rv,cv)
 	rv = sorted(rv, key=lambda r: r.rg, reverse=True)
 
-	while rv[0].rg > 0:
-		cv[rv[0].rf].add(rv[0].rv, sv[rv[0].rv])
+	while rv[0].rg > 0 and rv[0].rf>=0:
+		re = ev[rv[0].re]
+		cv[re.cs[rv[0].rf][0]].add(rv[0].rv, sv[rv[0].rv])
 		rv[0].rg = 0
 		rv[0].rf = -1
 
