@@ -2,6 +2,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <list>
 
 using namespace std;
 
@@ -39,39 +40,47 @@ void ov(const vector<T> &i)
 
 void proc()
 {
-	long
+	long long
 		n,
 		k,
 		m,
-		M; // min and Max
-	r(n); r(k);
+		M; //= &n+1000;
+	cin >> n >> k;
+	typedef list<pair<long long, long long>> aggregqueue;
+	aggregqueue q;
+	q.emplace_back(n,1);
 	
-	cerr << n << "  " << k << endl;
-	vector<bool> v(n, false);
-	cerr << n;
 	
-	for(; k>0; --k)
+	while(k>0)
 	{
-		int g = 0; // current gap size
-		int mg = 0; // biggest gap size
-		int mgi = 0;
-		for(int i=0; i<n; i++)
+		M = q.front().first/2;
+		m = (q.front().first-1)/2;
+		if(q.front().second < k)
+			k -= q.front().second;
+		else
+			k = 0;
+		//cerr << "k," << k << ": " << endl;
+		//for(auto e:q) cerr << "\t" << e.first << ", " << e.second << endl;
+		aggregqueue::reverse_iterator it=q.rbegin();
+		if(q.size()>1 and it->first == M or q.size() > 2 and (++it)->first == M)
 		{
-			g++;
-			if(v[i])
-				g=0;
-			if(g>mg)
-			{
-				mg=g;
-				mgi=i-g/2;
-			}
-			//cerr << k << ": " << i << ": " << mg << " " << mgi << " " << g << endl;
+			it->second += q.front().second;
 		}
-		m = mg;
-		v[mgi] = true;
+		else
+		{
+			q.emplace_back(M, q.front().second);
+		}
+		if(q.back().first == m)
+		{
+			q.back().second += q.front().second;
+		}
+		else
+		{
+			q.emplace_back(m, q.front().second);
+		}
+		q.pop_front();
 	}
-	
-	cout << m/2 << " " << m/2 - (m%2?0:1) ;
+	cout << M << " " << m;
 }
 
 int main()
@@ -84,7 +93,7 @@ int main()
 	for(int i = 1; i<t+1; i++)
 	{
 		cerr << "Starting case " << i << endl;
-		cout << "Case #" << i << ":";
+		cout << "Case #" << i << ": ";
 		proc();
 		cout << endl; 
 	}
