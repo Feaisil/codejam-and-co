@@ -1,0 +1,227 @@
+#!/usr/bin/env python3
+
+import sys,time, math
+cin=sys.stdin
+cerr=sys.stderr
+cout=sys.stdout
+
+def rl(cin):
+	"""readline and remove \n"""
+	return cin.readline()[:-1]
+cin.rl=lambda:rl(cin)
+def rs(cin):
+	return cin.rl().split()
+cin.rs=lambda:rs(cin)
+def ri(cin):
+	return int(cin.rl())
+cin.ri=lambda:ri(cin)
+def riv(cin):
+	return [int(x) for x in rs(cin)]
+cin.riv=lambda:riv(cin)
+def rf(cin):
+	return float(cin.rl())
+cin.rf=lambda:rf(cin)
+def rfv(cin):
+	return [float(x) for x in rs(cin)]
+cin.rfv=lambda:rfv(cin)
+def rev(i):
+	o=[]
+	for x in range(1,1+len(i)): o+=[i[-x]]
+	return o
+def revs(s):
+	return ''.join(rev(s))
+def isPrime(n):
+	for i in range(2, int(math.sqrt(n))):
+		if not i%n:
+			return true
+
+def printr(*args):
+	cerr.write(', '.join([repr(x) for x in args])+'\n')
+
+class bin_base:
+	def __init__(self):
+		pass
+	def up(self):
+		pass
+	def lo(self):
+		pass
+	def cont(self):
+		pass
+class bin_int:
+	def __init__(self, m=0, M=10):
+		self.m=m-1
+		self.M=M+1
+		self.c=int((self.M+self.m)/2)
+	def up(self):
+		self.m=self.c+1
+		self.c=int((self.M+self.m)/2)
+		return self.c
+	def lo(self):
+		self.M=self.c
+		self.c=int((self.m+self.M)/2)
+		return self.c
+	def cont(self):
+		return self.m < self.M
+
+def search(r, k, pred):
+	while r.cont():
+		pre=pred(r.c)
+		if pre < k:
+			r.up()
+		else:
+			r.lo()
+	return r.m
+
+def parse(cin):
+	l=cin.riv()
+	return l
+
+class end_point:
+	def __init__(self):
+		self.ld = 2 # latency to DC from 2 to 4000
+		self.k = 0 # number of caches from 0 to c
+		self.cs = [] # list of caches connections for this endpoint
+		# including id from 0 to c - 1 and latency from 1 to 500
+	def __init__(self, cin):
+		(self.ld, self.k) = cin.riv()
+		self.cs = []
+		for i in range(self.k):
+			self.cs += [tuple(cin.riv())]
+	def __repr__(self):
+		return "endp(ld:%s,k:%s,cs:%s)" % (self.ld, self.k, self.cs)
+
+class request:
+	def __init__(self):
+		self.rv = 0 # id of video, 0 to v - 1
+		self.re = 0 # id of endpoint, 0 to e - 1
+		self.rn = 0 # number of requests, 0 to 10000
+		self.rg = 0 # gains potentiel
+		self.rf = 0 # first ind ok
+	def __init__(self, cin):
+		(self.rv,self.re,self.rn) = cin.riv()
+		self.rg = 0
+		self.rf = 0
+	def __repr__(self):
+		return "req(rv:%s,re:%s,rn:%s)" % (self.rv, self.re, self.rn)
+
+class cache:
+	def __init__(self, i, cap):
+		self.i = i
+		self.cap = cap # remaining capacity of the cache, initialized at x
+		self.vid = [] # video ids
+	def can(self, vs):
+		return self.cap >= vs
+	def add(self, vi, vs): #vi vid id, 0 to v-1, vs vid size 1 to 1000
+		self.cap -= vs
+		self.vid += [vi]
+	def __repr__(self): # debug otuput
+		return "cache(id:%s,cap:%s,vids:%s)" % (self.i,self.cap, self.vid)
+	def __str__(self): # real output
+		if len(self.vid) == 0:
+			return str(self.i)
+		else:
+			return "%s %s" % (self.i, ' '.join([str(x) for x in self.vid]))
+
+def dummy_do(v,e,r,c,x,sv,ev,rv,cv):
+	# just copy me for your implem
+	return cv
+
+
+def dumb(v,e,r,c,x,sv,ev,rv,cv):
+	vid = 0 # current video id
+	vidv = range(v)
+	for cache_e in cv:
+		#for e in vidv
+		while cache_e.can(vid) and vid < v:
+			cache_e.add(vid, sv[vid])
+			vid+=1
+
+	return cv
+
+
+def calculerGains(v,e,r,c,x,sv,ev,rv,cv):
+	for req in rv :
+		if req.rf >= 0 :
+			notSet = True
+			i = 0
+			while notSet :
+				re = ev[req.re]
+				if (i+1>len(re.cs)) :
+					req.rg = 0
+					req.rf = -1
+					notSet = False
+				elif (cv[re.cs[i][0]].can(sv[req.rv])) and not(req.rv in cv[re.cs[i][0]].vid) :
+					req.rg = req.rn * (re.ld - re.cs[i][1])
+					req.rf = i
+					notSet = False
+				i += 1
+	return rv
+
+def dumb2(v,e,r,c,x,sv,ev,rv,cv):
+	for e in ev :
+		e.cs = sorted(e.cs, key=lambda c: c[1])
+
+	rv = calculerGains(v,e,r,c,x,sv,ev,rv,cv)
+	rv = sorted(rv, key=lambda r: r.rg, reverse=True)
+
+	while rv[0].rg > 0 and rv[0].rf>=0:
+		re = ev[rv[0].re]
+		cv[re.cs[rv[0].rf][0]].add(rv[0].rv, sv[rv[0].rv])
+		rv[0].rg = 0
+		rv[0].rf = -1
+
+		rv = calculerGains(v,e,r,c,x,sv,ev,rv,cv)
+		rv = sorted(rv, key=lambda r: r.rg, reverse=True)
+
+
+	#vid = 0 # current video id
+	#vidv = range(v)
+	#for cache_e in cv:
+		#for e in vidv
+	#	while cache_e.can(vid) and vid < v:
+	#		cache_e.add(vid, sv[vid])
+	#		vid+=1
+
+	return cv
+
+def do(l):
+	(v,e,r,c,x) = l
+	#v videos 1 to 10 000
+	#e endpoints 1 to 1 000
+	#r requests 1 to 1 000 000
+	#c caches 1 to 1 000
+	#x cache capacity 1 to 500 000
+
+	printr("videos",v,"end points",e,"requests",r,"caches",c,"x - capacity per cache",x)
+	sv = cin.riv()# list of videos sizes 1 to 1000
+	printr("videos sizes",sv)
+	ev = [] # list of end points
+	for i in range(e): ev += [end_point(cin)]
+	printr("endpoints",ev)
+	rv = [] # list of requests
+	for i in range(r): rv += [request(cin)]
+	printr("requests",rv)
+	cv = [cache(i, x) for i in range(c)]
+	printr("caches", cv)
+
+	dumb2(v,e,r,c,x,sv,ev,rv,cv)
+	print(len(cv))
+	for cache_e in cv: print(str(cache_e))
+
+def main():
+	start = time.time()
+	T=1
+	cerr.write("Going to process {} cases\n".format(T))
+	k=0
+	for Ti in range(1,T+1):
+		if math.log(100*Ti/T) > k:
+			cerr.write("case {}...".format(Ti))
+		do(parse(sys.stdin))
+		#print("case #{0}: {1}".format(Ti, do(parse(sys.stdin))))
+		if math.log(100*Ti/T) > k:
+			k+=1
+			cerr.write("duration {}\n".format(time.time()-start))
+	cerr.write("duration {0}\n".format(time.time()-start))
+
+if __name__=="__main__":
+	main()

@@ -1,2 +1,4 @@
 # codejam-and-co
-to host codejam and other competitions/fun solution sources
+
+hash code 2017 https://hashcode.withgoogle.com/
+
