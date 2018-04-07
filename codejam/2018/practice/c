@@ -73,11 +73,41 @@ def search(r, k, pred):
 	return r.m
 
 def parse(cin):
-	l=cin.riv()
+	l=[]
 	return l
 
 def do(l):
-	return l
+	l = cin.ri()
+	w = cin.rs()
+	
+	s1, s2, n,a,b,c,d = cin.rs()
+	s=[s1,s2]
+	n=int(n)
+	a=int(a)
+	b=int(b)
+	c=int(c)
+	d=int(d)
+	x = [ord(s1),ord(s2)]
+	for i in range(2,n):
+		x += [(a*x[i-1]+b*x[i-2]+ c) % d]
+	s = [s1,s2]+[ chr(97+e%26) for e in x][2:]
+	printr(s)
+	cnt = 0
+	v0 = [0 for i in range(26)]
+	
+	for e in w:
+		v = [0 for i in range(26)]
+		i=0
+		for c in e:
+			v[ord(c) - 97] +=1
+		for i in range(len(s)):
+			v[ord(s[i]) - 97] -= 1
+			if i >= len(e):
+				v[ord(s[i-len(e)]) - 97] += 1
+			if v == v0:
+				cnt+=1
+				break
+	return int(cnt)
 
 def main():
 	start = time.time()

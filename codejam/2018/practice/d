@@ -87,7 +87,7 @@ def main():
 	for Ti in range(1,T+1):
 		if math.log(100*Ti/T) > k:
 			cerr.write("case {}...".format(Ti))
-		print("case #{0}: {1}".format(Ti, do(sys.stdin)))
+		print("case #{0}: {1}".format(Ti, do(parse(sys.stdin))))
 		if math.log(100*Ti/T) > k:
 			k+=1
 			cerr.write("duration {}\n".format(time.time()-start))
