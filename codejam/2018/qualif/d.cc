@@ -1,8 +1,9 @@
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <set>
 #include <map>
-
+#include <cmath>
 using namespace std;
 
 template<typename T>
@@ -39,10 +40,16 @@ void ov(const vector<T> &i)
 
 void proc()
 {
-	vector<int> a;
-	rv(a);
-
-	ov(a);
+	double a;
+	static double s2 = 1.414213;
+	static double pi = 3.141592653589793;
+	cin >> a;
+	double t=(acos(a/s2));
+	cerr << t << endl;
+	cout << setprecision(20) << 0.5*cos(t-pi/4) << " "  <<  0.5*sin(t-pi/4) << " " <<  0 << endl;
+	cout << 0.5*cos(t+pi/4) << " " <<0.5*sin(t+pi/4) << " " << 0 << endl;
+	cout << 0 << " " << 0 << " " << 0.5 << endl;
+	
 }
 
 int main()
@@ -55,7 +62,7 @@ int main()
 	for(int i = 1; i<t+1; i++)
 	{
 		cerr << "Starting case " << i << endl;
-		cout << "Case #" << i << ": ";
+		cout << "Case #" << i << ": " << endl;
 		proc();
 		cout << endl; 
 	}

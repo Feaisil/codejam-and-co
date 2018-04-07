@@ -39,10 +39,50 @@ void ov(const vector<T> &i)
 
 void proc()
 {
-	vector<int> a;
-	rv(a);
-
-	ov(a);
+	int d;
+	string p;
+	
+	cin >> d >> p;
+	int str = 1;
+	int dmg = 0;
+	int min_dmg = 0;
+	for(char c: p)
+	{
+		if(c=='C')
+		{
+			str *= 2;
+		}
+		else
+		{
+			min_dmg++;
+			dmg += str;
+		}
+	}
+	
+	if(min_dmg > d)
+	{
+		cout << "IMPOSSIBLE";
+		return;
+	}
+	int res = 0;
+	while(dmg > d)
+	{
+		int c_str = str/2;
+		//cerr << p << " " << d << " " << dmg << endl;
+		for(auto it=p.rbegin(); it!= p.rend()-1; ++it)
+		{
+			if(*it == 'C')  c_str/=2;
+			if(*it == 'S' and *(it+1) == 'C')
+			{
+				swap(*it, *(it+1));
+				break;
+			}
+		}
+		res += 1;
+		dmg -= c_str;
+	}
+	//cerr << p << " " << d << " " << dmg << endl;
+	cout << res;
 }
 
 int main()

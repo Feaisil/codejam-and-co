@@ -2,6 +2,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <algorithm>
 
 using namespace std;
 
@@ -39,10 +40,32 @@ void ov(const vector<T> &i)
 
 void proc()
 {
-	vector<int> a;
+	vector<int> a, b;
 	rv(a);
-
-	ov(a);
+	b=a;
+	sort(a.begin(), a.end());
+	bool done= false;
+	while(not done)
+	{
+		done = true;
+		for(int i=0; i< b.size()-2; ++i)
+		if( b[i] > b[i+2] )
+		{
+			done = false;
+			swap(b[i], b[i+2]);
+		}
+	}
+	if(a==b) cout << "OK";
+	else
+	{
+		for(int i=0; i<a.size(); ++i)
+		{
+			if(a[i] != b[i])
+			{
+				cout << i; break;
+			}
+		}
+	}
 }
 
 int main()
